@@ -16,9 +16,12 @@ namespace EmployeeWebAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(EmployeeViewModel employeeView)
+        public IActionResult Add([FromForm] EmployeeViewModel employeeView)
         {
-            var employee = new Employee(employeeView.Name, employeeView.Age, null);
+            var filePath = Path.Combine("Storage", employeeView.Photo.FileName);
+            using Stream filestream = new FileStream(filePath, FileMode.Create);
+            employeeView.Photo.CopyTo(filestream);
+            var employee = new Employee(employeeView.Name, employeeView.Age, filePath);
             _employeeRepository.Add(employee);
             return Ok();
         }
